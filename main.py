@@ -78,4 +78,3 @@ elif type(today_commit_count) == str:
   client.create_tweet(text=today_commit_count)
 else:
   pass
-  
