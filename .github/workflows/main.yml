@@ -3,7 +3,8 @@ name: housework_bot
 on:
   schedule:
     # 定期実行する時間・・・①
-    - cron: '0 15 * * *'
+#     - cron: '0 15 * * *'
+    - cron: "*/5 * * * *"
 
 jobs:
   build:
