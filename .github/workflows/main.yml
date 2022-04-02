@@ -33,6 +33,7 @@ jobs:
           echo "GIT_USERNAME=${{ secrets.GIT_USERNAME }}" >> .env
           echo "GIT_CLIENT_ID=${{ secrets.GIT_CLIENT_ID }}" >> .env
           echo "GIT_CLIENT_SECRETS=${{ secrets.GIT_CLIENT_SECRETS }}" >> .env
+          pip install dotenv
           # 必要なパッケージインストール・・・②
       - name: Run script
         run: |
