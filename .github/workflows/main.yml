@@ -33,8 +33,20 @@ jobs:
           echo "GIT_USERNAME=${{ secrets.GIT_USERNAME }}" >> .env
           echo "GIT_CLIENT_ID=${{ secrets.GIT_CLIENT_ID }}" >> .env
           echo "GIT_CLIENT_SECRETS=${{ secrets.GIT_CLIENT_SECRETS }}" >> .env
-          pip install dotenv
           # 必要なパッケージインストール・・・②
+          
+          - name: Dotenv Action
+            # You may pin to the exact commit or the version.
+            # uses: falti/dotenv-action@d4d12eaa0e1dd06d5bdc3d7af3bf4c8c93cb5359
+            uses: falti/dotenv-action@v0.2.7
+            with:
+              # the path to the .env file (including file name)
+              path: .env
+              # whether to log the variables to output or not
+              log-variables: false
+              # whether to mask the variables as secrets or not
+              mask-variables: false
+          
       - name: Run script
         run: |
           # 定期実行するファイルを指定。・・・③
