@@ -73,11 +73,11 @@ while True:
         if start_date < commit_datetime:
           if commit_datetime < finish_date:
             # commitの日付が集計開始日より後なら1カウント
+            print(commit["commit"]["message"])
             total_commit_count += 1
         else:
           # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
           break
-
   repo_url_page_num += 1 # paginationを進める
 
 # Twitterへの投稿
@@ -96,10 +96,12 @@ Period : {2} - {3}
 Total Commit : {4}commit'''
 text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d') ,total_commit_count)
 
+print(text)
+
 ## 投稿
-if type(total_commit_count) == int:
-  client.create_tweet(text=text)
-elif type(total_commit_count) == str:
-  client.create_tweet(text=total_commit_count)
-else:
-  pass
+# if type(total_commit_count) == int:
+#   client.create_tweet(text=text)
+# elif type(total_commit_count) == str:
+#   client.create_tweet(text=total_commit_count)
+# else:
+#   pass
