@@ -7,7 +7,7 @@ import settings
 
 # TimeZone/日付 指定
 jp = pytz.timezone('Asia/Tokyo')
-finish_date = datetime.datetime.now().replace(hour=0,minute=0,second=0,microsecond=0).astimezone(jp) # 集計終了日（= Today )
+finish_date = datetime.datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)#.astimezone(jp) # 集計終了日（= Today )
 start_date = finish_date - datetime.timedelta(1) # 集計開始日（= 1日前）
 
 print(finish_date)
