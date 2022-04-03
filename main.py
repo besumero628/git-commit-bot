@@ -10,6 +10,9 @@ jp = pytz.timezone('Asia/Tokyo')
 finish_date = datetime.datetime.now().replace(hour=0,minute=0,second=0,microsecond=0).astimezone(jp) # 集計終了日（= Today )
 start_date = finish_date - datetime.timedelta(1) # 集計開始日（= 1日前）
 
+print(finish_date)
+print(start_date)
+
 # Git の設定
 git_username = settings.GIT_USERNAME
 git_client_id = settings.GIT_CLIENT_ID
@@ -71,10 +74,9 @@ while True:
 
         # commitの日付によって処理を振り分け
         if start_date < commit_datetime:
-          print(("{0} - {1}").format(commit_datetime, commit["commit"]["message"]))
           if commit_datetime < finish_date:
             # commitの日付が集計開始日より後なら1カウント
-            
+            # print(("{0} - {1}").format(commit_datetime, commit["commit"]["message"]))
             total_commit_count += 1
         else:
           # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
