@@ -15,6 +15,10 @@ git_username = settings.GIT_USERNAME
 git_client_id = settings.GIT_CLIENT_ID
 git_client_secrets = settings.GIT_CLIENT_SECRETS
 
+# query設定
+git_client_id_query = "&client_id=" + git_client_id
+git_client_secrets_query = "&client_secret=" + git_client_secrets
+
 # Twitter APIのキーを設定
 consumer_key = settings.TWITTER_CONSUMER_API_KEY
 consumer_secret = settings.TWITTER_CONSUMER_API_SECRET_KEY
@@ -23,44 +27,58 @@ consumer_secret = settings.TWITTER_CONSUMER_API_SECRET_KEY
 access_token=settings.TWITTER_ACCESS_TOKEN
 access_token_secret =settings.TWITTER_ACCESS_TOKEN_SECRET
 
-# 合計commit数初期化
-total_commit_count = 0 
+# 変数初期化
+total_commit_count = 0 # 合計commit数
+repo_url_page_num = 1 # repository取得の際のpagenation用
 
 # Gitの情報を取得
-## Repository全件の取得
-git_repositories_url = requests.get("https://api.github.com/users/" + git_username + "/repos?client_id=" + git_client_id +"&client_secret=" + git_client_secrets).text
-repositories = json.loads(git_repositories_url)
+while True:
+  # レポジトリを取得（1ページ最大100件）
+  repositories_url = "https://api.github.com/users/{0}/repos?per_page=100&page={1}{2}{3}".format(git_username, repo_url_page_num, git_client_id_query, git_client_secrets_query)
+  git_repositories = requests.get(repositories_url).text
+  repositories = json.loads(git_repositories)
 
-for repository in repositories:
-  # repository の名前/update（更新日）を取得
-  repo_name = repository["name"]
-  repo_update_date = datetime.datetime.fromisoformat(repository["updated_at"].replace('Z', '+00:00')).astimezone(jp)
+  if git_repositories == "[]":
+    break
+  elif type(repositories) != list and "API rate limit exceeded" in repositories["message"] :
+    total_commit_count = "Sorry, Today's Github API is limited..."
+    break
+  else:
+    pass
 
-  # updateが集計開始日より後であればcommit情報を取得
-  if start_date < repo_update_date and repo_update_date < finish_date:
-    ## 各リポジトリのcommitを取得
-    git_commits_url = requests.get("https://api.github.com/repos/" + git_username + "/" + repo_name + "/commits").text 
-    commits = json.loads(git_commits_url)
 
-    # API 取得がlimitを超えてしまった場合の例外処理
-    if type(commits) != list and "API rate limit exceeded" in commits["message"] :
-      total_commit_count = "Sorry, Today's Github API is limited..."
-      break
+  for repository in repositories:
+    # repository の名前/update（更新日）を取得
+    repo_name = repository["name"]
+    repo_update_date = datetime.datetime.fromisoformat(repository["pushed_at"].replace('Z', '+00:00')).astimezone(jp)
 
-    # commitの内容を取得
-    for commit in commits:
-      # commit の日付を取得
-      commit_datetime = datetime.datetime.fromisoformat(commit["commit"]["committer"]["date"].replace('Z', '+00:00')).astimezone(jp)
+    # updateが集計開始日より後であればcommit情報を取得
+    if start_date < repo_update_date: #and repo_update_date < finish_date:
+      ## 各リポジトリのcommitを取得
+      git_commits_url = "https://api.github.com/repos/{0}/{1}/commits".format(git_username, repo_name)
+      git_commits = requests.get(git_commits_url).text
+      commits = json.loads(git_commits)
 
-      # commitの日付によって処理を振り分け
-      if start_date < commit_datetime and commit_datetime < finish_date:
-        # commitの日付が集計開始日より後なら1カウント
-        total_commit_count += 1
-      else:
-        # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
+      # API 取得がlimitを超えてしまった場合の例外処理
+      if type(commits) != list and "API rate limit exceeded" in commits["message"] :
+        total_commit_count = "Sorry, Today's Github API is limited..."
         break
 
-print(total_commit_count)
+      # commitの内容を取得
+      for commit in commits:
+        # commit の日付を取得
+        commit_datetime = datetime.datetime.fromisoformat(commit["commit"]["committer"]["date"].replace('Z', '+00:00')).astimezone(jp)
+
+        # commitの日付によって処理を振り分け
+        if start_date < commit_datetime:
+          if commit_datetime < finish_date:
+            # commitの日付が集計開始日より後なら1カウント
+            total_commit_count += 1
+        else:
+          # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
+          break
+
+  repo_url_page_num += 1 # paginationを進める
 
 # Twitterへの投稿
 ## TwitterClientの作成
@@ -76,10 +94,7 @@ Github Name: {0}
 Github URL: https://github.com/{1}
 Period : {2} - {3} 
 Total Commit : {4}commit'''
-
 text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d') ,total_commit_count)
-
-print(text)
 
 ## 投稿
 if type(total_commit_count) == int:
