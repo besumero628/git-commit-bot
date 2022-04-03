@@ -23,8 +23,8 @@ consumer_secret = settings.TWITTER_CONSUMER_API_SECRET_KEY
 access_token=settings.TWITTER_ACCESS_TOKEN
 access_token_secret =settings.TWITTER_ACCESS_TOKEN_SECRET
 
-# 本日のcommit数初期化
-today_commit_count = 0 
+# 合計commit数初期化
+total_commit_count = 0 
 
 # Gitの情報を取得
 ## Repository全件の取得
@@ -37,14 +37,14 @@ for repository in repositories:
   repo_update_date = datetime.datetime.fromisoformat(repository["updated_at"].replace('Z', '+00:00')).astimezone(jp)
 
   # updateが集計開始日より後であればcommit情報を取得
-  if repo_update_date > start_date:
+  if start_date < repo_update_date and repo_update_date < finish_date:
     ## 各リポジトリのcommitを取得
     git_commits_url = requests.get("https://api.github.com/repos/" + git_username + "/" + repo_name + "/commits").text 
     commits = json.loads(git_commits_url)
 
     # API 取得がlimitを超えてしまった場合の例外処理
     if type(commits) != list and "API rate limit exceeded" in commits["message"] :
-      today_commit_count = "Sorry, Today's Github API is limited..."
+      total_commit_count = "Sorry, Today's Github API is limited..."
       break
 
     # commitの内容を取得
@@ -53,12 +53,14 @@ for repository in repositories:
       commit_datetime = datetime.datetime.fromisoformat(commit["commit"]["committer"]["date"].replace('Z', '+00:00')).astimezone(jp)
 
       # commitの日付によって処理を振り分け
-      if commit_datetime > start_date:
+      if start_date < commit_datetime and commit_datetime < finish_date:
         # commitの日付が集計開始日より後なら1カウント
-        today_commit_count += 1
+        total_commit_count += 1
       else:
         # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
         break
+
+print(total_commit_count)
 
 # Twitterへの投稿
 ## TwitterClientの作成
@@ -69,12 +71,20 @@ client = tweepy.Client(
   access_token_secret=access_token_secret
 )
 ## 投稿文
-text = "【Github Oneday Bot】\nGithub Name: " + git_username + "\nGithub URL: https://github.com/" + git_username + "\nToday's Commit : " + str(today_commit_count) + "commit"
+raw_text = '''【Github Commit Bot】
+Github Name: {0}
+Github URL: https://github.com/{1}
+Period : {2} - {3} 
+Total Commit : {4}commit'''
+
+text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d') ,total_commit_count)
+
+print(text)
 
 ## 投稿
-if type(today_commit_count) == int:
+if type(total_commit_count) == int:
   client.create_tweet(text=text)
-elif type(today_commit_count) == str:
-  client.create_tweet(text=today_commit_count)
+elif type(total_commit_count) == str:
+  client.create_tweet(text=total_commit_count)
 else:
   pass
