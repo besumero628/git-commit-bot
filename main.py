@@ -71,9 +71,10 @@ while True:
 
         # commitの日付によって処理を振り分け
         if start_date < commit_datetime:
+          print(("{0} - {1}").format(commit_datetime, commit["commit"]["message"]))
           if commit_datetime < finish_date:
             # commitの日付が集計開始日より後なら1カウント
-            print(("{0} - {1}").format(commit_datetime, commit["commit"]["message"]))
+            
             total_commit_count += 1
         else:
           # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
