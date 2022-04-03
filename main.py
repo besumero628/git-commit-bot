@@ -10,9 +10,6 @@ jp = pytz.timezone('Asia/Tokyo')
 finish_date = datetime.datetime.now().astimezone(jp).replace(hour=0,minute=0,second=0,microsecond=0) # 集計終了日（= Today )
 start_date = finish_date - datetime.timedelta(1) # 集計開始日（= 1日前）
 
-print(finish_date)
-print(start_date)
-
 # Git の設定
 git_username = settings.GIT_USERNAME
 git_client_id = settings.GIT_CLIENT_ID
@@ -76,7 +73,6 @@ while True:
         if start_date < commit_datetime:
           if commit_datetime < finish_date:
             # commitの日付が集計開始日より後なら1カウント
-            # print(("{0} - {1}").format(commit_datetime, commit["commit"]["message"]))
             total_commit_count += 1
         else:
           # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
@@ -99,12 +95,10 @@ Period : {2} - {3}
 Total Commit : {4}commit'''
 text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d') ,total_commit_count)
 
-print(text)
-
-## 投稿
-# if type(total_commit_count) == int:
-#   client.create_tweet(text=text)
-# elif type(total_commit_count) == str:
-#   client.create_tweet(text=total_commit_count)
-# else:
-#   pass
+# 投稿
+if type(total_commit_count) == int:
+  client.create_tweet(text=text)
+elif type(total_commit_count) == str:
+  client.create_tweet(text=total_commit_count)
+else:
+  pass
