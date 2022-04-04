@@ -1,3 +1,5 @@
+[日本語版README.mdはこちら](https://github.com/besumero628/git-commit-bot/blob/main/README-ja.md)
+
 # git-commit-bot
 
 This is a python source code that can post as a TwitterBot using GitHubAPI / TwitterAPI to count the number of commits on a daily basis.
@@ -46,7 +48,22 @@ To relax the usage limit of the GitHub API, you must obtain the following OAuth 
 - Client ID
 - Client Secret
 
+The following information registration, including the above, must be registered individually by clicking on Security-Secrets-Actions-NewRepositorySecrets from the repository settings.
 
+
+```python
+TWITTER_CONSUMER_API_KEY = "API key"
+TWITTER_CONSUMER_API_SECRET_KEY = "API Key Secret"
+TWITTER_ACCESS_TOKEN = "Access Token"
+TWITTER_ACCESS_TOKEN_SECRET = "Access Token Secret"
+GIT_USERNAME = "UserName"
+GIT_CLIENT_ID = "Client ID"
+GIT_CLIENT_SECRETS = "Client secrets"
+```
+
+If you are working locally, you will need to write the above variables to .env.
+  
+Please refer to the .env.sample.
 
 # Usage
 
