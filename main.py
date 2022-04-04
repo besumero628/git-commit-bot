@@ -92,7 +92,8 @@ raw_text = '''【Github Commit Bot】
 Github Name: {0}
 Github URL: https://github.com/{1}
 Period : {2} - {3} 
-Total Commit : {4}commit'''
+Total Commit : {4}commit
+#GitHub #GitHubCommitBot'''
 text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d') ,total_commit_count)
 
 # 投稿
