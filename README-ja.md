@@ -1,3 +1,5 @@
+[English README is here](https://github.com/besumero628/git-commit-bot/blob/main/README.md)
+
 # git-commit-bot
 
 GitHubAPI / TwitterAPI を利用して日々のcommit数を集計し、TwitterBotとして投稿可能なpythonソースコードです.
