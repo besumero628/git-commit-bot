@@ -49,11 +49,11 @@ while True:
   for repository in repositories:
     # repository の名前/pushed_at（push日）を取得
     repo_name = repository["name"]
-    repo_update_date = datetime.datetime.fromisoformat(repository["pushed_at"].replace('Z', '+00:00')).astimezone(jp)
+    repo_pushed_date = datetime.datetime.fromisoformat(repository["pushed_at"].replace('Z', '+00:00')).astimezone(jp)
     commit_url_page_num = 1
 
     # updateが集計開始日より後であればcommit情報を取得
-    if start_date < repo_update_date: #and repo_update_date < finish_date:
+    if start_date < repo_pushed_date:
       while True:
         ## 各リポジトリのcommitを取得
         git_commits_url = "https://api.github.com/repos/{0}/{1}/commits?per_page=100&page={2}{3}{4}".format(git_username, repo_name, commit_url_page_num, git_client_id_query, git_client_secrets_query)
