@@ -46,37 +46,44 @@ while True:
   else:
     pass
 
-
   for repository in repositories:
-    # repository の名前/update（更新日）を取得
+    # repository の名前/pushed_at（push日）を取得
     repo_name = repository["name"]
     repo_update_date = datetime.datetime.fromisoformat(repository["pushed_at"].replace('Z', '+00:00')).astimezone(jp)
+    commit_url_page_num = 1
 
     # updateが集計開始日より後であればcommit情報を取得
     if start_date < repo_update_date: #and repo_update_date < finish_date:
-      ## 各リポジトリのcommitを取得
-      git_commits_url = "https://api.github.com/repos/{0}/{1}/commits".format(git_username, repo_name)
-      git_commits = requests.get(git_commits_url).text
-      commits = json.loads(git_commits)
+      while True:
+        ## 各リポジトリのcommitを取得
+        git_commits_url = "https://api.github.com/repos/{0}/{1}/commits?per_page=100&page={2}{3}{4}".format(git_username, repo_name, commit_url_page_num, git_client_id_query, git_client_secrets_query)
+        git_commits = requests.get(git_commits_url).text
+        commits = json.loads(git_commits)
 
-      # API 取得がlimitを超えてしまった場合の例外処理
-      if type(commits) != list and "API rate limit exceeded" in commits["message"] :
-        total_commit_count = "Sorry, Today's Github API is limited..."
-        break
-
-      # commitの内容を取得
-      for commit in commits:
-        # commit の日付を取得
-        commit_datetime = datetime.datetime.fromisoformat(commit["commit"]["committer"]["date"].replace('Z', '+00:00')).astimezone(jp)
-
-        # commitの日付によって処理を振り分け
-        if start_date < commit_datetime:
-          if commit_datetime < finish_date:
-            # commitの日付が集計開始日より後なら1カウント
-            total_commit_count += 1
-        else:
-          # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
+        # API 取得がlimitを超えてしまった場合の例外処理
+        if git_commits == "[]":
           break
+        elif type(commits) != list and "API rate limit exceeded" in commits["message"] :
+          total_commit_count = "Sorry, Today's Github API is limited..."
+          break
+        else:
+          pass
+
+        # commitの内容を取得
+        for commit in commits:
+          # commit の日付を取得
+          commit_datetime = datetime.datetime.fromisoformat(commit["commit"]["committer"]["date"].replace('Z', '+00:00')).astimezone(jp)
+
+          # commitの日付によって処理を振り分け
+          if start_date < commit_datetime:
+            if commit_datetime < finish_date:
+              # commitの日付が集計開始日より後なら1カウント
+              total_commit_count += 1
+          else:
+            # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
+            break
+        
+        commit_url_page_num += 1 # paginationを進める
   repo_url_page_num += 1 # paginationを進める
 
 # Twitterへの投稿
