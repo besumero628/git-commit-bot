@@ -83,8 +83,8 @@ while True:
             # commitの日付が開始日よりも前ならbreakして次のリポジトリへ
             break
         
-        commit_url_page_num += 1 # paginationを進める
-  repo_url_page_num += 1 # paginationを進める
+        commit_url_page_num += 1 # commit paginationを進める
+  repo_url_page_num += 1 # repository paginationを進める
 
 # Twitterへの投稿
 ## TwitterClientの作成
