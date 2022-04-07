@@ -86,6 +86,8 @@ while True:
         commit_url_page_num += 1 # commit paginationを進める
   repo_url_page_num += 1 # repository paginationを進める
 
+w_list = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+
 # Twitterへの投稿
 ## TwitterClientの作成
 client = tweepy.Client(
@@ -98,10 +100,10 @@ client = tweepy.Client(
 raw_text = '''【Github Commit Bot】
 Github Name: {0}
 Github URL: https://github.com/{1}
-Period : {2} - {3} 
-Total Commit : {4}commit
+Period : {2}({4}) - {3} ({5})
+Total Commit : {6}commit
 #GitHub #GitHubCommitBot'''
-text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d') ,total_commit_count)
+text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d'), w_list[start_date.weekday()], w_list[finish_date.weekday()] ,total_commit_count)
 
 # 投稿
 if type(total_commit_count) == int:
