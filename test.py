@@ -21,6 +21,14 @@ access_token_secret =settings.TWITTER_ACCESS_TOKEN_SECRET
 
 
 # Gitの情報を取得
+contributions_url = "https://github-contributions-api.deno.dev/{0}.json".format(git_username)
+contributions_text = requests.get(contributions_url).text
+contributions = json.loads(contributions_text)
+contribution = contributions['contributions'][-1][-2]
+
+start_date = datetime.datetime.strptime(contribution['date'], '%Y-%m-%d')
+finish_date = start_date + datetime.timedelta(days=1)
+contribution_count = contribution['contributionCount']
 
 w_list = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
@@ -32,19 +40,21 @@ client = tweepy.Client(
   access_token=access_token, 
   access_token_secret=access_token_secret
 )
-## 投稿文
+# ## 投稿文
 raw_text = '''【Github Commit Bot】
 Github Name: {0}
 Github URL: https://github.com/{1}
 Period : {2}({4}) - {3} ({5})
 Total Commit : {6}commit
 #GitHub #GitHubCommitBot'''
-text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d'), w_list[start_date.weekday()], w_list[finish_date.weekday()] ,total_commit_count)
+text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d'), w_list[start_date.weekday()], w_list[finish_date.weekday()] ,contribution_count)
 
-# 投稿
-if type(total_commit_count) == int:
-  client.create_tweet(text=text)
-elif type(total_commit_count) == str:
-  client.create_tweet(text=total_commit_count)
-else:
-  pass
+print(text)
+
+# # 投稿
+# if type(total_commit_count) == int:
+#   client.create_tweet(text=text)
+# elif type(total_commit_count) == str:
+#   client.create_tweet(text=total_commit_count)
+# else:
+#   pass
