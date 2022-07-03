@@ -51,12 +51,10 @@ Total Commit : {6}commit
 #GitHub #GitHubCommitBot'''
 text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d'), w_list[start_date.weekday()], w_list[finish_date.weekday()] ,contribution_count)
 
-print(text)
-
-# ## 投稿
-# if type(contribution_count) == int:
-#   client.create_tweet(text=text)
-# elif type(contribution_count) == str:
-#   client.create_tweet(text=contribution_count)
-# else:
-#   pass
+## 投稿
+if type(contribution_count) == int:
+  client.create_tweet(text=text)
+elif type(contribution_count) == str:
+  client.create_tweet(text=contribution_count)
+else:
+  pass
