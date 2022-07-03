@@ -23,7 +23,10 @@ access_token_secret =settings.TWITTER_ACCESS_TOKEN_SECRET
 contributions_url = "https://github-contributions-api.deno.dev/{0}.json".format(git_username)
 contributions_text = requests.get(contributions_url).text
 contributions = json.loads(contributions_text)
-contribution = contributions['contributions'][-1][-2]
+try:
+  contribution = contributions['contributions'][-1][-2]
+except IndexError:
+  contribution = contributions['contributions'][-2][-1]
 
 start_date = datetime.datetime.strptime(contribution['date'], '%Y-%m-%d')
 finish_date = start_date + datetime.timedelta(days=1)
@@ -48,10 +51,12 @@ Total Commit : {6}commit
 #GitHub #GitHubCommitBot'''
 text = raw_text.format(git_username, git_username, start_date.strftime('%m/%d'), finish_date.strftime('%m/%d'), w_list[start_date.weekday()], w_list[finish_date.weekday()] ,contribution_count)
 
-## 投稿
-if type(contribution_count) == int:
-  client.create_tweet(text=text)
-elif type(contribution_count) == str:
-  client.create_tweet(text=contribution_count)
-else:
-  pass
+print(text)
+
+# ## 投稿
+# if type(contribution_count) == int:
+#   client.create_tweet(text=text)
+# elif type(contribution_count) == str:
+#   client.create_tweet(text=contribution_count)
+# else:
+#   pass
